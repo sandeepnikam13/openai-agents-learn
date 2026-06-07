@@ -20,8 +20,13 @@ async def on_message(message: cl.Message):
     await msg.send()
 
     # session
+    session_id = cl.user_session.get("id")
+    if not isinstance(session_id, str):
+        session_id = str(cl.context.session.id)
+        cl.user_session.set("id", session_id)
+
     session = AdvancedSQLiteSession(
-        session_id=cl.user_session.get("id"),
+        session_id=session_id,
         db_path="conversasations.db",
         create_tables=True
     )

@@ -8,3 +8,9 @@ dependencies = [
     "chainlit>=2.11.1",
     "openai-agents>=0.14.5",
 ]
+
+[tool.pyright]
+extraPaths = [
+    "first_agent",
+    "first_agent/second_agent_tools"
+]
