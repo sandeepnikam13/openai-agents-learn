@@ -6,11 +6,15 @@ A repository for learning, prototyping, and building intelligent agents using th
 
 ## 🚀 Current Progress & Active Development
 
-Our primary focus is currently on the **First Agent** (`first_agent/`), which serves as the main active development agent. 
+We are building and testing multiple agents to explore the capabilities of the `openai-agents` SDK and [Chainlit](https://chainlit.io/).
 
-### Key Achievements
-1. **Chainlit Python UI Integration**: Integrated the agent runner with a modern, streaming web-based chat interface using [Chainlit](https://chainlit.io/).
-2. **Session-Scoped Memory**: Configured advanced memory persistence using `AdvancedSQLiteSession` linked to Chainlit's unique `user_session.id`. This ensures that conversation context and agent memory are fully maintained across multiple user messages in the same session.
+### 1. First Agent (`first_agent/`)
+* **Chainlit Python UI Integration**: Integrated the agent runner with a modern, streaming web-based chat interface using Chainlit.
+* **Session-Scoped Memory**: Configured advanced memory persistence using `AdvancedSQLiteSession` linked to Chainlit's unique `user_session.id`. This ensures that conversation context and agent memory are fully maintained across multiple user messages in the same session.
+
+### 2. Second Agent with Tools (`second_agent_tools/`)
+* **OpenAI Agent Framework Tool Calling**: Demonstrates how to define and register tools/functions for the agent to call dynamically.
+* **Chainlit Chat Message Tools Display**: Displays step-by-step tool execution and tool outputs directly in the Chainlit chat UI.
 
 ---
 
@@ -21,6 +25,10 @@ Our primary focus is currently on the **First Agent** (`first_agent/`), which se
 ├── first_agent/                # Main development agent folder
 │   ├── first_agent.py          # Core Agent definition & model setup
 │   ├── first_agent_ui.py       # Chainlit UI wrapper with SQLite session memory
+│   └── conversations.db        # SQLite database storing session histories
+├── second_agent_tools/         # Second agent folder (Tool calling showcase)
+│   ├── bank_agent.py           # Core Bank Agent definition & tool definitions
+│   ├── bank_agent_ui.py        # Chainlit UI wrapper displaying tool calls
 │   └── conversations.db        # SQLite database storing session histories
 ├── simple_agent/               # Basic agent implementation for quick tests
 ├── main.py                     # Synchronous CLI entrypoint
@@ -49,7 +57,13 @@ To launch the main UI for the **First Agent**:
 cd first_agent
 uv run python -m chainlit run first_agent_ui.py -w
 ```
-This will start the development server (usually at `http://localhost:8000`) with auto-reload enabled.
+
+To launch the UI for the **Second Agent (Tools)**:
+```powershell
+cd second_agent_tools
+uv run python -m chainlit run bank_agent_ui.py -w
+```
+This will start the development server (usually at `http://localhost:8000` or `http://localhost:8001`) with auto-reload enabled.
 
 ---
 
