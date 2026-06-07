@@ -56,7 +56,12 @@ async def main(message: cl.Message):
         # 🧠 STREAM TEXT (BUFFERED)
         # =========================
         if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+            if text_buffer == "":
+                msg = cl.Message(content="")
+                await msg.send()
+
             text_buffer += event.data.delta
+            await msg.stream_token(event.data.delta)
 
         # =========================
         # 🔧 TOOL EVENTS
@@ -132,7 +137,6 @@ async def main(message: cl.Message):
                     tool_running = False
 
 
-    msg = cl.Message(content = text_buffer)
     await msg.send()
 
 
