@@ -1,3 +1,5 @@
+import json
+
 import chainlit as cl
 from dotenv import load_dotenv
 from agents import Runner
@@ -49,6 +51,12 @@ async def main(message: cl.Message):
     thinking_step = None
     tool_running = False
 
+    async def removeThinking():
+        nonlocal thinking_step
+        if thinking_step:
+            await thinking_step.remove()
+            thinking_step = None
+
     async for event in result.stream_events():
 
 
@@ -56,6 +64,7 @@ async def main(message: cl.Message):
         # 🧠 STREAM TEXT (BUFFERED)
         # =========================
         if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+            await removeThinking()
             if text_buffer == "":
                 msg = cl.Message(content="")
                 await msg.send()
@@ -67,14 +76,14 @@ async def main(message: cl.Message):
         # 🔧 TOOL EVENTS
         # =========================
         elif event.type == "run_item_stream_event":
-
+            await removeThinking()
             # -------- TOOL CALLED --------
             if event.name == "tool_called":
+              
                 tool_running = True
 
-                # Flush any pending text BEFORE tool UI
+                # Reset text buffer — already streamed token-by-token
                 if text_buffer:
-                    await msg.stream_token(text_buffer)
                     text_buffer = ""
 
 
@@ -117,7 +126,7 @@ async def main(message: cl.Message):
                 if call_id and call_id in active_steps:
                     step = active_steps[call_id]
 
-                    import json
+
                     try:
                         output_str = (
                             json.dumps(output, indent=2)
@@ -136,8 +145,22 @@ async def main(message: cl.Message):
                 if not active_steps:
                     tool_running = False
 
+        if not tool_running and not thinking_step and not text_buffer and event.type != "raw_response_event":
+            thinking_step = cl.Step(
+                name="🤔 Thinking...",
+                type="llm",
+                parent_id=msg.id
+            )
+            await thinking_step.send()
+
+    await removeThinking()
+
+    if text_buffer:
+        await msg.stream_token(text_buffer)
 
     await msg.send()
+
+   
 
 
 
